@@ -1,5 +1,5 @@
 {
-  "savedAt": 1793688186143,
+  "savedAt": 1793689464698,
   "currentThemeId": 5,
   "slotMode": "tier_64",
   "currentTier": {
@@ -834,8 +834,8 @@
       "scale": 1
     },
     "thien_duong_pos_guide": {
-      "left": 10.13,
-      "top": 23.21,
+      "left": 8.09,
+      "top": 23.56,
       "scale": 0.77
     },
     "thien_duong_pos_merit": {
