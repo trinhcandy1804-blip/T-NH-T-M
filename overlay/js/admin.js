@@ -82,16 +82,20 @@
   const btnTestTts = document.getElementById('btn-test-tts');
   const btnTriggerChant = document.getElementById('btn-trigger-chant');
   const btnSaveVoice = document.getElementById('btn-save-voice');
+  const inputGiftRandomTemplates = document.getElementById('input-gift-random-templates');
 
   // DOM Elements - Slots & HUD
   const selectSlotMode = document.getElementById('select-slot-mode');
   const btnSampleFills = document.querySelectorAll('.btn-fill-sample');
+  const btnResetMerit = document.getElementById('btn-reset-merit');
   const btnClearSeats = document.getElementById('btn-clear-seats');
   const selectHudPos = document.getElementById('select-hud-pos');
   const sliderHudOffsetY = document.getElementById('slider-hud-offsety');
   const valHudOffsetY = document.getElementById('val-hud-offsety');
   const sliderHudOpacity = document.getElementById('slider-hud-opacity');
   const valHudOpacity = document.getElementById('val-hud-opacity');
+  const sliderHudScale = document.getElementById('slider-hud-scale');
+  const valHudScale = document.getElementById('val-hud-scale');
   const chkHudCollapse = document.getElementById('chk-hud-collapse');
   const btnSaveHud = document.getElementById('btn-save-hud');
 
@@ -217,6 +221,12 @@
 
     if (evt.isIncenseOffering || evt.action === 'offer_incense') {
       logActivity(`🪔 [Dâng Hương] Phật tử ${name} (ghế #${idx}) lên cắm nhang bái Phật`, '#fde047');
+    } else if (evt.action === 'replace_seat') {
+      const oldName = (evt.replacedUser && evt.replacedUser.nickname) || 'người trước';
+      logActivity(`🔄 [Thế Chỗ] ${name} vào thế chỗ của ${oldName} (ghế #${idx})`, '#fbbf24');
+    } else if (evt.action === 'leave_seat') {
+      const uName = (evt.user && evt.user.nickname) || name;
+      logActivity(`🚶 [Xả Thiền] ${uName} hoàn thành 10 phút tĩnh tâm và rời phòng (ghế #${idx} trống)`, '#94a3b8');
     } else if (evt.action === 'join_seat') {
       logActivity(`🙏 [Vào Thiền] ${name} ngồi bồ đoàn #${idx} (skin: ${skin})`, '#93c5fd');
     } else if (evt.action === 'change_skin') {
@@ -232,7 +242,9 @@
   socket.on('chant_speech', payload => {
     if (!payload) return;
     const shortText = (payload.text || '').length > 45 ? payload.text.substring(0, 45) + '...' : payload.text;
-    logActivity(`🎙️ [Đọc Kinh] "${shortText}"`, '#fed7aa');
+    logActivity(`🎙️ [Xướng Tên] "${shortText}"`, '#fed7aa');
+    // Không tự động phát âm thanh trên trang Admin để tránh nói đè / tạo tiếng vọng (echo 2-3 lần)
+    // khi người dùng mở đồng thời cả trang Admin và Overlay trên cùng 1 máy tính.
   });
 
   socket.on('bell_ring', () => {
@@ -322,51 +334,93 @@
   });
 
   function syncVoiceConfigUI(cfg) {
-    if (cfg.id && selectVoicePreset) {
-      selectVoicePreset.value = cfg.id;
+    if (!cfg) return;
+    const active = document.activeElement;
+    const pid = cfg.presetId || cfg.id;
+    if (pid && selectVoicePreset && active !== selectVoicePreset) {
+      selectVoicePreset.value = pid;
     }
-    if (typeof cfg.pitchHz === 'number') {
+    if (typeof cfg.pitchHz === 'number' && active !== sliderPitch) {
       sliderPitch.value = cfg.pitchHz;
       valPitch.textContent = `${cfg.pitchHz} Hz`;
     }
-    if (typeof cfg.ratePercent === 'number') {
+    if (typeof cfg.ratePercent === 'number' && active !== sliderRate) {
       sliderRate.value = cfg.ratePercent;
       valRate.textContent = `${cfg.ratePercent} %`;
     }
-    if (typeof cfg.reverbLevel === 'number') {
+    if (typeof cfg.reverbLevel === 'number' && active !== sliderReverb) {
       sliderReverb.value = cfg.reverbLevel;
       valReverb.textContent = cfg.reverbLevel;
     }
-    if (cfg.bgMusicTrack) {
+    if (cfg.bgMusicTrack && active !== selectBgMusic) {
       selectBgMusic.value = cfg.bgMusicTrack;
       if (groupCustomMp3) {
         groupCustomMp3.style.display = cfg.bgMusicTrack === 'custom_mp3' ? 'flex' : 'none';
       }
     }
-    if (typeof cfg.bgMusicVolume === 'number') {
+    if (typeof cfg.bgMusicVolume === 'number' && active !== sliderMusicVol) {
       sliderMusicVol.value = cfg.bgMusicVolume;
       valMusicVol.textContent = `${Math.round(cfg.bgMusicVolume * 100)}%`;
+    }
+    if (inputGiftRandomTemplates && active !== inputGiftRandomTemplates) {
+      const templates = Array.isArray(cfg.giftThankTemplates) && cfg.giftThankTemplates.length > 0
+        ? cfg.giftThankTemplates
+        : (cfg.meritTemplate ? [cfg.meritTemplate] : []);
+      if (templates.length > 0) {
+        inputGiftRandomTemplates.value = templates.join('\n');
+      }
     }
   }
 
   btnSaveVoice.addEventListener('click', () => {
+    const pId = selectVoicePreset.value;
+    const isFemale = pId.includes('nu') || pId.includes('su_co');
+    const randomTemplates = inputGiftRandomTemplates
+      ? inputGiftRandomTemplates.value.split('\n').map(s => s.trim()).filter(Boolean)
+      : undefined;
+
+    const pitch = Number(sliderPitch.value) || 0;
+    const rate = Number(sliderRate.value) || 0;
+    const revVal = Number(sliderReverb.value) || 0.28;
     const payload = {
-      presetId: selectVoicePreset.value,
-      pitchHz: Number(sliderPitch.value),
-      ratePercent: Number(sliderRate.value),
-      reverbLevel: Number(sliderReverb.value),
+      presetId: pId,
+      voiceName: isFemale ? 'vi-VN-HoaiMyNeural' : 'vi-VN-NamMinhNeural',
+      pitchHz: pitch,
+      ratePercent: rate,
+      playbackRate: Number((1.0 + rate / 100.0).toFixed(2)),
+      warmthDb: Number(Math.max(0, -pitch * 0.55).toFixed(2)),
+      mciSpeed: Math.round(1000 * (1.0 + rate / 100.0)),
+      reverbLevel: revVal,
       bgMusicTrack: selectBgMusic.value,
-      bgMusicVolume: Number(sliderMusicVol.value)
+      bgMusicVolume: Number(sliderMusicVol.value),
+      giftThankTemplates: randomTemplates,
+      meritTemplate1Coin: (randomTemplates && randomTemplates[0]) || undefined,
+      meritTemplate: (randomTemplates && randomTemplates[0]) || undefined
     };
+
+    btnSaveVoice.disabled = true;
+    btnSaveVoice.textContent = '⏳ Đang lưu...';
 
     fetch('/api/voice/config', {
       method: 'POST',
       headers: { 'Content-Type': 'application/json' },
       body: JSON.stringify(payload)
     }).then(r => r.json()).then(data => {
-      if (data.ok) {
-        logActivity('💾 Đã lưu cấu hình âm thanh & giọng đọc', '#4ade80');
+      btnSaveVoice.disabled = false;
+      if (data && data.ok) {
+        btnSaveVoice.textContent = '✅ Đã Lưu';
+        setTimeout(() => {
+          btnSaveVoice.textContent = '💾 Lưu';
+        }, 2200);
+        logActivity(`💾 Đã lưu cấu hình: Pitch ${pitch}Hz, Rate ${rate}%, Reverb ${revVal}, Nhạc nền ${selectBgMusic.options[selectBgMusic.selectedIndex]?.text || selectBgMusic.value} (${Math.round(payload.bgMusicVolume * 100)}%)`, '#4ade80');
+      } else {
+        btnSaveVoice.textContent = '💾 Lưu';
+        logActivity('Lỗi lưu cấu hình: ' + (data?.error || 'Không rõ'), '#ef4444');
       }
+    }).catch(err => {
+      btnSaveVoice.disabled = false;
+      btnSaveVoice.textContent = '💾 Lưu';
+      logActivity('Lỗi mạng khi lưu: ' + err.message, '#ef4444');
     });
   });
 
@@ -389,28 +443,74 @@
     });
   });
 
-  btnTestTts.addEventListener('click', () => {
+  btnTestTts.addEventListener('click', async () => {
     ensureAudio();
-    const text = 'Nam Mô A Di Đà Phật. Cầu chúc quý Phật tử vạn sự bình an, tâm thanh tịnh.';
+    const text = 'Nam Mô A Di Đà Phật. Kính chúc quý Phật tử vạn sự bình an, thân tâm thanh tịnh, gia đạo an khang.';
     const pId = selectVoicePreset.value;
-    const pitch = sliderPitch.value;
-    const rate = sliderRate.value;
-    const url = `/api/tts?text=${encodeURIComponent(text)}&presetId=${pId}&pitchHz=${pitch}&ratePercent=${rate}&t=${Date.now()}`;
+    const isFemale = pId.includes('nu') || pId.includes('su_co');
+    const vName = isFemale ? 'vi-VN-HoaiMyNeural' : 'vi-VN-NamMinhNeural';
+    const pitch = Number(sliderPitch.value) || 0;
+    const rate = Number(sliderRate.value) || 0;
+    const revLvl = Number(sliderReverb.value) || 0.28;
+    const presetLabel = selectVoicePreset.options[selectVoicePreset.selectedIndex]?.text || pId;
     
-    logActivity('▶️ Đang nghe thử giọng đọc TTS...', '#38bdf8');
-    const ttsAudio = new Audio(url);
-    ttsAudio.play().catch(e => {
+    logActivity(`▶️ Đang nghe thử: [${presetLabel}] (Pitch: ${pitch}Hz, Tốc độ: +${rate}%, Vang: ${revLvl})...`, '#38bdf8');
+    btnTestTts.disabled = true;
+    const originalBtnText = btnTestTts.textContent;
+    btnTestTts.textContent = '⏳ Đang tổng hợp...';
+
+    try {
+      const url = `/api/tts?text=${encodeURIComponent(text)}&presetId=${pId}&voiceName=${vName}&pitchHz=${pitch}&ratePercent=${rate}&t=${Date.now()}`;
+      const res = await fetch(url);
+      if (!res.ok) throw new Error(`HTTP ${res.status}`);
+      const arrayBuf = await res.arrayBuffer();
+      
+      // Chuyển arrayBuffer thành base64 để phát qua WebAudio DSP Engine
+      let binary = '';
+      const bytes = new Uint8Array(arrayBuf);
+      const len = bytes.byteLength;
+      for (let i = 0; i < len; i++) {
+        binary += String.fromCharCode(bytes[i]);
+      }
+      const audioBase64 = window.btoa(binary);
+
+      btnTestTts.textContent = '🔊 Đang phát...';
+      await audio.playChantSpeech({
+        audioBase64,
+        text,
+        voiceConfig: {
+          presetId: pId,
+          voiceName: vName,
+          pitchHz: pitch,
+          ratePercent: rate,
+          playbackRate: Number((1.0 + rate / 100.0).toFixed(2)),
+          warmthDb: Number(Math.max(0, -pitch * 0.55).toFixed(2)),
+          reverbLevel: revLvl
+        }
+      });
+      btnTestTts.textContent = '✅ Đã nghe thử';
+      setTimeout(() => {
+        btnTestTts.textContent = originalBtnText;
+        btnTestTts.disabled = false;
+      }, 1500);
+      logActivity(`✅ Đã hoàn tất nghe thử giọng đọc kinh chuẩn 432Hz`, '#4ade80');
+    } catch (e) {
       console.warn('Audio play error:', e);
+      btnTestTts.textContent = originalBtnText;
+      btnTestTts.disabled = false;
       logActivity('Lỗi phát âm thanh: ' + e.message, '#ef4444');
-    });
+    }
   });
 
   btnTriggerChant.addEventListener('click', () => {
+    const pId = selectVoicePreset.value;
+    const isFemale = pId.includes('nu') || pId.includes('su_co');
     fetch('/api/chant', {
       method: 'POST',
       headers: { 'Content-Type': 'application/json' },
       body: JSON.stringify({
-        presetId: selectVoicePreset.value,
+        presetId: pId,
+        voiceName: isFemale ? 'vi-VN-HoaiMyNeural' : 'vi-VN-NamMinhNeural',
         pitchHz: Number(sliderPitch.value),
         ratePercent: Number(sliderRate.value)
       })
@@ -450,6 +550,19 @@
     });
   });
 
+  if (btnResetMerit) {
+    btnResetMerit.addEventListener('click', () => {
+      if (!confirm('Bạn có chắc chắn muốn reset toàn bộ điểm công đức và Bảng Công Đức về 0?')) return;
+      fetch('/api/merit/reset', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({})
+      }).then(r => r.json()).then(() => {
+        logActivity('✨ Đã reset Bảng Công Đức và điểm công đức về ban đầu', '#f6c453');
+      });
+    });
+  }
+
   btnClearSeats.addEventListener('click', () => {
     if (!confirm('Bạn có chắc chắn muốn giải phóng toàn bộ bồ đoàn không?')) return;
     fetch('/api/seats/clear', {
@@ -470,6 +583,12 @@
     valHudOpacity.textContent = `${Math.round(sliderHudOpacity.value * 100)}%`;
   });
 
+  if (sliderHudScale && valHudScale) {
+    sliderHudScale.addEventListener('input', () => {
+      valHudScale.textContent = `${Math.round(sliderHudScale.value * 100)}%`;
+    });
+  }
+
   function syncHudConfigUI(cfg) {
     if (cfg.guidePosition && selectHudPos) {
       selectHudPos.value = cfg.guidePosition;
@@ -482,6 +601,10 @@
       sliderHudOpacity.value = cfg.guideOpacity;
       valHudOpacity.textContent = `${Math.round(cfg.guideOpacity * 100)}%`;
     }
+    if (typeof cfg.guideScale === 'number' && sliderHudScale) {
+      sliderHudScale.value = cfg.guideScale;
+      valHudScale.textContent = `${Math.round(cfg.guideScale * 100)}%`;
+    }
     if (typeof cfg.guideCollapsed === 'boolean') {
       chkHudCollapse.checked = cfg.guideCollapsed;
     }
@@ -492,6 +615,7 @@
       guidePosition: selectHudPos.value,
       guideOffsetY: Number(sliderHudOffsetY.value),
       guideOpacity: Number(sliderHudOpacity.value),
+      guideScale: Number(sliderHudScale ? sliderHudScale.value : 1.0),
       guideCollapsed: chkHudCollapse.checked
     };
 
@@ -611,11 +735,14 @@
 
   // Simulator: Tặng Quà TikTok
   btnSimGift.addEventListener('click', () => {
+    ensureAudio();
     const nick = (inputSimNickname.value || 'Thí Chủ').trim();
     const selectedOpt = selectSimGift.options[selectSimGift.selectedIndex];
     const giftName = selectedOpt ? selectedOpt.value : 'Hoa Sen Vàng';
     const coins = selectedOpt ? Number(selectedOpt.getAttribute('data-coins')) : 10;
     const repeat = Math.max(1, Number(inputSimRepeat.value) || 1);
+
+    logActivity(`🎁 Đang phát sự kiện tặng quà [${giftName}] từ [${nick}]...`, '#38bdf8');
 
     fetch('/api/gift', {
       method: 'POST',
@@ -627,9 +754,14 @@
         diamondCount: coins,
         repeatCount: repeat,
         presetId: selectVoicePreset.value,
+        voiceName: (selectVoicePreset.value.includes('nu') || selectVoicePreset.value.includes('su_co')) ? 'vi-VN-HoaiMyNeural' : 'vi-VN-NamMinhNeural',
         pitchHz: Number(sliderPitch.value),
         ratePercent: Number(sliderRate.value)
       })
+    }).then(r => r.json()).then(res => {
+      if (res && res.ok) {
+        logActivity(`✅ Đã gửi quà thành công, hệ thống đang xướng tên hồi hướng!`, '#10b981');
+      }
     });
   });
 
@@ -737,6 +869,10 @@
         });
     });
   }
+
+  socket.on('voice_config_changed', cfg => {
+    syncVoiceConfigUI(cfg);
+  });
 
   socket.on('text_config_changed', cfg => {
     syncTextConfigUI(cfg);

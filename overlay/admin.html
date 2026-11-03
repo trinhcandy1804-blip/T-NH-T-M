@@ -101,10 +101,12 @@
       <div class="form-group">
         <label class="form-label" for="select-voice-preset">Mẫu Giọng Đọc Cài Sẵn:</label>
         <select id="select-voice-preset" class="form-select">
-          <option value="nam_nhuanduc" selected>Nam Ấm Trầm (Thích Nhuận Đức)</option>
-          <option value="nam_trungnien">Nam Trung Niên Trang Nghiêm (Minh Tuệ)</option>
+          <option value="nam_tram_doc_kinh" selected>Giọng Nam Trầm Ấm Đọc Kinh (Khuyên dùng)</option>
+          <option value="lao_hoa_thuong">Giọng Lão Hòa Thượng Uy Nghiêm (Trầm Sâu)</option>
+          <option value="thay_phap_thoai">Giọng Thầy Trẻ Ấm Áp Pháp Thoại</option>
+          <option value="su_co_thanh_tinh">Giọng Sư Cô / Nữ Thanh Tịnh Dịu Hiền</option>
+          <option value="nam_nhuanduc">Nam Ấm Trầm (Thích Nhuận Đức)</option>
           <option value="nu_diudang">Nữ Dịu Dàng Truyền Cảm (Thảo Vy)</option>
-          <option value="chuong_tinh_tam">Chuông Mõ Tịnh Tâm (Thuần Âm Nhạc)</option>
         </select>
       </div>
 
@@ -161,6 +163,11 @@
         </div>
       </div>
 
+      <div class="form-group" style="margin-top:10px;">
+        <label class="form-label" style="color:#fde047;">🎁 10 Câu Cảm Ơn Tặng Xu Ngẫu Nhiên (mỗi dòng 1 câu, tự điền {name}):</label>
+        <textarea id="input-gift-random-templates" class="form-control" rows="8" style="font-size:0.8rem; line-height:1.45; resize:vertical;"></textarea>
+      </div>
+
       <div class="form-row" style="margin-top:6px;">
         <button id="btn-test-tts" class="btn btn-blue" style="flex:1;">▶️ Nghe Thử TTS</button>
         <button id="btn-trigger-chant" class="btn btn-gold" style="flex:1;">📿 Phát Kinh Live</button>
@@ -195,8 +202,9 @@
         </div>
       </div>
 
-      <div class="form-group">
-        <button id="btn-clear-seats" class="btn btn-red" style="width:100%;">🧹 Giải Phóng Toàn Bộ Bồ Đoàn</button>
+      <div class="form-group" style="display:flex; gap:6px;">
+        <button id="btn-reset-merit" class="btn btn-gold" style="flex:1;" title="Xóa Bảng Công Đức và đưa tất cả điểm công đức về 0">✨ Reset Công Đức</button>
+        <button id="btn-clear-seats" class="btn btn-red" style="flex:1;" title="Giải phóng toàn bộ bồ đoàn cho Phật tử mới vào">🧹 Làm Trống Ghế</button>
       </div>
 
       <hr style="border:none; border-top:1px solid rgba(229,184,91,0.2); margin:6px 0;" />
@@ -229,6 +237,14 @@
         <div class="range-container">
           <input type="range" id="slider-hud-opacity" class="range-slider" min="0.3" max="1" step="0.05" value="0.95" />
           <span id="val-hud-opacity" class="range-val">95%</span>
+        </div>
+      </div>
+
+      <div class="form-group">
+        <label class="form-label" style="color:#fde047;">🔍 Cỡ Chữ / Phóng To Khung HUD (Scale):</label>
+        <div class="range-container">
+          <input type="range" id="slider-hud-scale" class="range-slider" min="0.8" max="2.2" step="0.05" value="1.0" />
+          <span id="val-hud-scale" class="range-val">100%</span>
         </div>
       </div>
 
@@ -395,7 +411,7 @@
     </section>
   </main>
 
-  <script src="/js/audioEngine.js"></script>
-  <script src="/js/admin.js"></script>
+  <script src="/js/audioEngine.js?v=6.5"></script>
+  <script src="/js/admin.js?v=6.5"></script>
 </body>
 </html>

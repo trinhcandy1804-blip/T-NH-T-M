@@ -18,6 +18,9 @@ class TempleAudioEngine {
     this.customAudioEl = null;
     this.isSpeaking = false;
     this.melodyStep = 0;
+    this.speechQueue = [];
+    this.isProcessingSpeechQueue = false;
+    this.activeSourceNode = null;
 
     this.config = {
       woodenFishEnabled: true,
@@ -410,8 +413,36 @@ class TempleAudioEngine {
 
   /**
    * Phát Giọng Nam Trầm Ấm Đọc Kinh / Xướng Tên qua Bộ Lọc Âm Học Chánh Điện
+   * (Được xếp hàng tuần tự - TUYỆT ĐỐI KHÔNG BAO GIỜ NÓI ĐÈ LÊN NHAU)
    */
-  async playChantSpeech({ audioBase64, text, voiceConfig }) {
+  async playChantSpeech(payload) {
+    return new Promise(resolve => {
+      this.speechQueue.push({ payload, resolve });
+      this.processSpeechQueue();
+    });
+  }
+
+  async processSpeechQueue() {
+    if (this.isProcessingSpeechQueue) return;
+    this.isProcessingSpeechQueue = true;
+
+    while (this.speechQueue.length > 0) {
+      const current = this.speechQueue.shift();
+      try {
+        await this._playChantSpeechDirect(current.payload);
+        // Nghỉ 600ms tĩnh lặng thanh tịnh giữa 2 lần đọc
+        await new Promise(r => setTimeout(r, 600));
+      } catch (err) {
+        console.warn('[AudioEngine] Lỗi trong hàng đợi đọc:', err);
+      } finally {
+        if (current.resolve) current.resolve();
+      }
+    }
+
+    this.isProcessingSpeechQueue = false;
+  }
+
+  async _playChantSpeechDirect({ audioBase64, text, voiceConfig }) {
     if (voiceConfig) {
       this.updateConfig(voiceConfig);
     }
@@ -439,9 +470,10 @@ class TempleAudioEngine {
         const audioBuffer = await this.ctx.decodeAudioData(bytes.buffer.slice(0));
         const source = this.ctx.createBufferSource();
         source.buffer = audioBuffer;
+        this.activeSourceNode = source;
 
         const rate = Number(this.config.playbackRate) || 0.93;
-        source.playbackRate.value = Math.max(0.75, Math.min(1.15, rate));
+        source.playbackRate.value = Math.max(0.60, Math.min(1.60, rate));
 
         const lowShelf = this.ctx.createBiquadFilter();
         lowShelf.type = 'lowshelf';
@@ -455,7 +487,7 @@ class TempleAudioEngine {
 
         const dryGain = this.ctx.createGain();
         const wetGain = this.ctx.createGain();
-        const revLvl = Math.max(0, Math.min(0.65, Number(this.config.reverbLevel) ?? 0.28));
+        const revLvl = Math.max(0, Math.min(0.85, Number(this.config.reverbLevel) ?? 0.28));
         dryGain.gain.value = 1.0;
         wetGain.gain.value = revLvl;
 
@@ -472,7 +504,10 @@ class TempleAudioEngine {
         }
 
         await new Promise(resolve => {
-          source.onended = resolve;
+          source.onended = () => {
+            this.activeSourceNode = null;
+            resolve();
+          };
           source.start(0);
         });
 
@@ -499,6 +534,9 @@ class TempleAudioEngine {
       });
     }
     this.isSpeaking = false;
+    if (this.customAudioEl && this.config.bgMusicEnabled) {
+      this.customAudioEl.volume = Math.max(0, Math.min(1, (Number(this.config.bgMusicVolume) || 0.38) * 0.85));
+    }
   }
 }
 

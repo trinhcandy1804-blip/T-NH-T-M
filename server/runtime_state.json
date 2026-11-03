@@ -1,338 +1,470 @@
 {
-  "savedAt": 1793608081380,
-  "currentThemeId": 1,
+  "savedAt": 1793676359847,
+  "currentThemeId": 2,
   "slotMode": "auto",
   "currentTier": {
-    "total": 24,
-    "cols": 4,
-    "rows": 6
+    "total": 48,
+    "cols": 6,
+    "rows": 8
   },
   "seats": [
     {
       "index": 0,
       "row": 0,
       "col": 0,
-      "occupied": true,
-      "user": {
-        "uniqueId": "thanh hương",
-        "nickname": "Thanh Hương",
-        "skin": "su",
-        "joinedAt": 1793608029581,
-        "lastActive": 1793608019581,
-        "meritPoints": 0,
-        "hasMeritAura": false,
-        "prayerText": "Nam Mô A Di Đà Phật 🙏"
-      }
+      "occupied": false,
+      "user": null
     },
     {
       "index": 1,
       "row": 0,
       "col": 1,
-      "occupied": true,
-      "user": {
-        "uniqueId": "minh tâm",
-        "nickname": "Minh Tâm",
-        "skin": "nu",
-        "joinedAt": 1793608026581,
-        "lastActive": 1793608019581,
-        "meritPoints": 0,
-        "hasMeritAura": false,
-        "prayerText": "Nam Mô A Di Đà Phật 🙏"
-      }
+      "occupied": false,
+      "user": null
     },
     {
       "index": 2,
       "row": 0,
       "col": 2,
-      "occupied": true,
-      "user": {
-        "uniqueId": "an nhiên",
-        "nickname": "An Nhiên",
-        "skin": "nu",
-        "joinedAt": 1793608023581,
-        "lastActive": 1793608019581,
-        "meritPoints": 0,
-        "hasMeritAura": false,
-        "prayerText": "Nam Mô A Di Đà Phật 🙏"
-      }
+      "occupied": false,
+      "user": null
     },
     {
       "index": 3,
       "row": 0,
       "col": 3,
-      "occupied": true,
-      "user": {
-        "uniqueId": "quang huy",
-        "nickname": "Quang Huy",
-        "skin": "nam",
-        "joinedAt": 1793608020581,
-        "lastActive": 1793608019581,
-        "meritPoints": 0,
-        "hasMeritAura": false,
-        "prayerText": "Nam Mô A Di Đà Phật 🙏"
-      }
+      "occupied": false,
+      "user": null
     },
     {
       "index": 4,
-      "row": 1,
-      "col": 0,
-      "occupied": true,
-      "user": {
-        "uniqueId": "hoàng nam",
-        "nickname": "Hoàng Nam",
-        "skin": "nu",
-        "joinedAt": 1793608017581,
-        "lastActive": 1793608019581,
-        "meritPoints": 0,
-        "hasMeritAura": false,
-        "prayerText": "Nam Mô A Di Đà Phật 🙏"
-      }
+      "row": 0,
+      "col": 4,
+      "occupied": false,
+      "user": null
     },
     {
       "index": 5,
-      "row": 1,
-      "col": 1,
-      "occupied": true,
-      "user": {
-        "uniqueId": "bảo ngọc",
-        "nickname": "Bảo Ngọc",
-        "skin": "su",
-        "joinedAt": 1793608014581,
-        "lastActive": 1793608019581,
-        "meritPoints": 0,
-        "hasMeritAura": false,
-        "prayerText": "Nam Mô A Di Đà Phật 🙏"
-      }
+      "row": 0,
+      "col": 5,
+      "occupied": false,
+      "user": null
     },
     {
       "index": 6,
       "row": 1,
-      "col": 2,
-      "occupied": true,
-      "user": {
-        "uniqueId": "diệu linh",
-        "nickname": "Diệu Linh",
-        "skin": "nu",
-        "joinedAt": 1793608011581,
-        "lastActive": 1793608019581,
-        "meritPoints": 0,
-        "hasMeritAura": false,
-        "prayerText": "Nam Mô A Di Đà Phật 🙏"
-      }
+      "col": 0,
+      "occupied": false,
+      "user": null
     },
     {
       "index": 7,
       "row": 1,
-      "col": 3,
-      "occupied": true,
-      "user": {
-        "uniqueId": "tuệ minh",
-        "nickname": "Tuệ Minh",
-        "skin": "nam",
-        "joinedAt": 1793608008581,
-        "lastActive": 1793608019581,
-        "meritPoints": 0,
-        "hasMeritAura": false,
-        "prayerText": "Nam Mô A Di Đà Phật 🙏"
-      }
+      "col": 1,
+      "occupied": false,
+      "user": null
     },
     {
       "index": 8,
-      "row": 2,
-      "col": 0,
-      "occupied": true,
-      "user": {
-        "uniqueId": "thu hà",
-        "nickname": "Thu Hà",
-        "skin": "nu",
-        "joinedAt": 1793608005581,
-        "lastActive": 1793608019581,
-        "meritPoints": 0,
-        "hasMeritAura": false,
-        "prayerText": "Nam Mô A Di Đà Phật 🙏"
-      }
+      "row": 1,
+      "col": 2,
+      "occupied": false,
+      "user": null
     },
     {
       "index": 9,
-      "row": 2,
-      "col": 1,
-      "occupied": true,
-      "user": {
-        "uniqueId": "ngọc lan",
-        "nickname": "Ngọc Lan",
-        "skin": "su",
-        "joinedAt": 1793608002581,
-        "lastActive": 1793608019581,
-        "meritPoints": 0,
-        "hasMeritAura": false,
-        "prayerText": "Nam Mô A Di Đà Phật 🙏"
-      }
+      "row": 1,
+      "col": 3,
+      "occupied": false,
+      "user": null
     },
     {
       "index": 10,
-      "row": 2,
-      "col": 2,
-      "occupied": true,
-      "user": {
-        "uniqueId": "đức anh",
-        "nickname": "Đức Anh",
-        "skin": "nam",
-        "joinedAt": 1793607999581,
-        "lastActive": 1793608019581,
-        "meritPoints": 0,
-        "hasMeritAura": false,
-        "prayerText": "Nam Mô A Di Đà Phật 🙏"
-      }
+      "row": 1,
+      "col": 4,
+      "occupied": false,
+      "user": null
     },
     {
       "index": 11,
-      "row": 2,
-      "col": 3,
-      "occupied": true,
-      "user": {
-        "uniqueId": "hải đăng",
-        "nickname": "Hải Đăng",
-        "skin": "nam",
-        "joinedAt": 1793607996581,
-        "lastActive": 1793608019581,
-        "meritPoints": 0,
-        "hasMeritAura": false,
-        "prayerText": "Nam Mô A Di Đà Phật 🙏"
-      }
+      "row": 1,
+      "col": 5,
+      "occupied": false,
+      "user": null
     },
     {
       "index": 12,
-      "row": 3,
+      "row": 2,
       "col": 0,
-      "occupied": true,
-      "user": {
-        "uniqueId": "mai anh",
-        "nickname": "Mai Anh",
-        "skin": "nu",
-        "joinedAt": 1793607993581,
-        "lastActive": 1793608019581,
-        "meritPoints": 0,
-        "hasMeritAura": false,
-        "prayerText": "Nam Mô A Di Đà Phật 🙏"
-      }
+      "occupied": false,
+      "user": null
     },
     {
       "index": 13,
-      "row": 3,
+      "row": 2,
       "col": 1,
-      "occupied": true,
-      "user": {
-        "uniqueId": "phương thảo",
-        "nickname": "Phương Thảo",
-        "skin": "nam",
-        "joinedAt": 1793607990581,
-        "lastActive": 1793608019581,
-        "meritPoints": 0,
-        "hasMeritAura": false,
-        "prayerText": "Nam Mô A Di Đà Phật 🙏"
-      }
+      "occupied": false,
+      "user": null
     },
     {
       "index": 14,
-      "row": 3,
+      "row": 2,
       "col": 2,
-      "occupied": true,
-      "user": {
-        "uniqueId": "trung kiên",
-        "nickname": "Trung Kiên",
-        "skin": "nam",
-        "joinedAt": 1793607987581,
-        "lastActive": 1793608019581,
-        "meritPoints": 0,
-        "hasMeritAura": false,
-        "prayerText": "Nam Mô A Di Đà Phật 🙏"
-      }
+      "occupied": false,
+      "user": null
     },
     {
       "index": 15,
-      "row": 3,
+      "row": 2,
       "col": 3,
       "occupied": false,
       "user": null
     },
     {
       "index": 16,
-      "row": 4,
-      "col": 0,
+      "row": 2,
+      "col": 4,
       "occupied": false,
       "user": null
     },
     {
       "index": 17,
+      "row": 2,
+      "col": 5,
+      "occupied": false,
+      "user": null
+    },
+    {
+      "index": 18,
+      "row": 3,
+      "col": 0,
+      "occupied": false,
+      "user": null
+    },
+    {
+      "index": 19,
+      "row": 3,
+      "col": 1,
+      "occupied": false,
+      "user": null
+    },
+    {
+      "index": 20,
+      "row": 3,
+      "col": 2,
+      "occupied": false,
+      "user": null
+    },
+    {
+      "index": 21,
+      "row": 3,
+      "col": 3,
+      "occupied": false,
+      "user": null
+    },
+    {
+      "index": 22,
+      "row": 3,
+      "col": 4,
+      "occupied": false,
+      "user": null
+    },
+    {
+      "index": 23,
+      "row": 3,
+      "col": 5,
+      "occupied": false,
+      "user": null
+    },
+    {
+      "index": 24,
+      "row": 4,
+      "col": 0,
+      "occupied": false,
+      "user": null
+    },
+    {
+      "index": 25,
       "row": 4,
       "col": 1,
       "occupied": false,
       "user": null
     },
     {
-      "index": 18,
+      "index": 26,
       "row": 4,
       "col": 2,
       "occupied": false,
       "user": null
     },
     {
-      "index": 19,
+      "index": 27,
       "row": 4,
       "col": 3,
       "occupied": false,
       "user": null
     },
     {
-      "index": 20,
+      "index": 28,
+      "row": 4,
+      "col": 4,
+      "occupied": false,
+      "user": null
+    },
+    {
+      "index": 29,
+      "row": 4,
+      "col": 5,
+      "occupied": false,
+      "user": null
+    },
+    {
+      "index": 30,
       "row": 5,
       "col": 0,
       "occupied": false,
       "user": null
     },
     {
-      "index": 21,
+      "index": 31,
       "row": 5,
       "col": 1,
       "occupied": false,
       "user": null
     },
     {
-      "index": 22,
+      "index": 32,
       "row": 5,
       "col": 2,
       "occupied": false,
       "user": null
     },
     {
-      "index": 23,
+      "index": 33,
       "row": 5,
       "col": 3,
       "occupied": false,
       "user": null
+    },
+    {
+      "index": 34,
+      "row": 5,
+      "col": 4,
+      "occupied": false,
+      "user": null
+    },
+    {
+      "index": 35,
+      "row": 5,
+      "col": 5,
+      "occupied": false,
+      "user": null
+    },
+    {
+      "index": 36,
+      "row": 6,
+      "col": 0,
+      "occupied": false,
+      "user": null
+    },
+    {
+      "index": 37,
+      "row": 6,
+      "col": 1,
+      "occupied": false,
+      "user": null
+    },
+    {
+      "index": 38,
+      "row": 6,
+      "col": 2,
+      "occupied": false,
+      "user": null
+    },
+    {
+      "index": 39,
+      "row": 6,
+      "col": 3,
+      "occupied": false,
+      "user": null
+    },
+    {
+      "index": 40,
+      "row": 6,
+      "col": 4,
+      "occupied": false,
+      "user": null
+    },
+    {
+      "index": 41,
+      "row": 6,
+      "col": 5,
+      "occupied": false,
+      "user": null
+    },
+    {
+      "index": 42,
+      "row": 7,
+      "col": 0,
+      "occupied": false,
+      "user": null
+    },
+    {
+      "index": 43,
+      "row": 7,
+      "col": 1,
+      "occupied": false,
+      "user": null
+    },
+    {
+      "index": 44,
+      "row": 7,
+      "col": 2,
+      "occupied": false,
+      "user": null
+    },
+    {
+      "index": 45,
+      "row": 7,
+      "col": 3,
+      "occupied": false,
+      "user": null
+    },
+    {
+      "index": 46,
+      "row": 7,
+      "col": 4,
+      "occupied": false,
+      "user": null
+    },
+    {
+      "index": 47,
+      "row": 7,
+      "col": 5,
+      "occupied": false,
+      "user": null
     }
   ],
-  "meritList": [],
+  "meritList": [
+    {
+      "uniqueId": "itzzgiha",
+      "nickname": "mặt hay cọc 🤧",
+      "points": 88,
+      "lastGift": "Wink wink",
+      "updatedAt": 1793674480440
+    },
+    {
+      "uniqueId": "nquynhquynh",
+      "nickname": "Như Quỳnh 🫧",
+      "points": 12,
+      "lastGift": "Hoa Hồng",
+      "updatedAt": 1793673664125
+    },
+    {
+      "uniqueId": "dauu.19",
+      "nickname": "⋆˚Công chúa Bong bóng𝜗𝜚",
+      "points": 12,
+      "lastGift": "Hoa Hồng",
+      "updatedAt": 1793673028495
+    },
+    {
+      "uniqueId": "ntnq_0013",
+      "nickname": "𝙣𝙝𝙪𝙦𝙪𝙮𝙮",
+      "points": 8,
+      "lastGift": "Hoa Hồng",
+      "updatedAt": 1793672956473
+    },
+    {
+      "uniqueId": "83_86b",
+      "nickname": "Bảo bảo",
+      "points": 4,
+      "lastGift": "Hoa Hồng",
+      "updatedAt": 1793673905348
+    },
+    {
+      "uniqueId": "tt262208",
+      "nickname": "Thoại ✌️",
+      "points": 4,
+      "lastGift": "Hoa Hồng",
+      "updatedAt": 1793673852077
+    },
+    {
+      "uniqueId": "congdanhhamloi_com",
+      "nickname": "Burning Paint",
+      "points": 4,
+      "lastGift": "Hoa Hồng",
+      "updatedAt": 1793673630014
+    },
+    {
+      "uniqueId": "linhthuyy002",
+      "nickname": "14th.2_",
+      "points": 4,
+      "lastGift": "Hoa Hồng",
+      "updatedAt": 1793673380410
+    },
+    {
+      "uniqueId": "dhsksnsbdkd",
+      "nickname": "nì ní",
+      "points": 4,
+      "lastGift": "Hoa Hồng",
+      "updatedAt": 1793673264247
+    },
+    {
+      "uniqueId": "nini.do68",
+      "nickname": "Nini68",
+      "points": 4,
+      "lastGift": "Hoa Hồng",
+      "updatedAt": 1793673194717
+    },
+    {
+      "uniqueId": "nhung_899",
+      "nickname": "Hồng Nhung",
+      "points": 4,
+      "lastGift": "Hoa Hồng",
+      "updatedAt": 1793673049560
+    },
+    {
+      "uniqueId": "30210714113",
+      "nickname": "Dương Hí's",
+      "points": 4,
+      "lastGift": "Hoa Hồng",
+      "updatedAt": 1793672992034
+    }
+  ],
   "voiceConfig": {
     "id": "nam_tram_doc_kinh",
     "name": "Giọng Nam Trầm Ấm Đọc Kinh (Khuyên dùng)",
     "voiceName": "vi-VN-NamMinhNeural",
-    "pitchHz": -18,
-    "ratePercent": -20,
-    "reverbLevel": 0.28,
-    "warmthDb": 4.5,
-    "playbackRate": 0.93,
-    "mciSpeed": 930,
+    "pitchHz": -15,
+    "ratePercent": -30,
+    "reverbLevel": 0.1,
+    "warmthDb": 8.25,
+    "playbackRate": 0.7,
+    "mciSpeed": 700,
     "woodenFishEnabled": true,
     "woodenFishBpm": 46,
     "bellEnabled": true,
     "bgMusicEnabled": true,
     "bgMusicTrack": "zen_pentatonic_432",
     "customMp3Url": "",
-    "bgMusicVolume": 0.38,
+    "bgMusicVolume": 0.4,
     "autoChantEnabled": true,
     "autoChantIntervalSec": 120,
-    "meritTemplate": "Nam Mô A Di Đà Phật. Xin thành tâm hồi hướng công đức cho thí chủ {name} đã phát tâm cúng dường {gift}. Nguyện cầu cho thí chủ cùng gia quyến thân tâm an lạc, sở cầu như ý."
+    "giftThankTemplates": [
+      "Xin cảm tạ tín chủ {name} đã phát tâm cúng dường, kính chúc tín chủ thân tâm an lạc, vạn sự cát tường.",
+      "Cảm tạ thiện duyên của tín chủ {name}, nguyện cầu tín chủ luôn bình an, phúc lành tăng trưởng.",
+      "Xin tri ân tấm lòng của tín chủ {name}. Nguyện Đức Phật từ bi gia hộ cho tín chủ và gia đình được bình an, mạnh khỏe.",
+      "Kính chúc tín chủ {name} phúc tuệ song tu, gia đạo an khang, mọi sự hanh thông.",
+      "Xin cảm niệm thiện tâm của tín chủ {name}, nguyện cầu cuộc sống luôn an vui, tâm hồn thanh tịnh, gia đình hạnh phúc.",
+      "Nguyện chúc tín chủ {name} gieo duyên lành, gặt quả thiện, phúc báu ngày càng tăng trưởng.",
+      "Xin cảm tạ thiện duyên của quý Phật tử {name}, kính chúc quý vị thân khỏe tâm an, gia đình hòa thuận.",
+      "Kính chúc tín chủ {name} luôn gặp điều lành, tránh điều dữ, cuộc sống bình an, thuận duyên như ý.",
+      "Xin tri ân tấm lòng thiện lành của tín chủ {name}. Nguyện cầu ánh sáng từ bi soi đường, dẫn lối cho tín chủ trên đường đời.",
+      "Kính chúc tín chủ {name} phước lành viên mãn, tâm an trí sáng, gia đình hưng thịnh."
+    ],
+    "meritTemplate1Coin": "Xin cảm tạ tín chủ {name} đã phát tâm cúng dường, kính chúc tín chủ thân tâm an lạc, vạn sự cát tường.",
+    "meritTemplate": "Xin cảm tạ tín chủ {name} đã phát tâm cúng dường, kính chúc tín chủ thân tâm an lạc, vạn sự cát tường.",
+    "presetId": "nam_tram_doc_kinh"
   },
   "hudConfig": {
     "guidePosition": "top_left",
@@ -345,5 +477,49 @@
     "guideCollapsed": false,
     "carouselSpeedSec": 6
   },
-  "activeTikTokUsername": ""
+  "hudPositions": {
+    "thien_duong_pos_tophud": {
+      "left": 4.5,
+      "top": 7.2,
+      "scale": 1
+    },
+    "thien_duong_pos_guide": {
+      "left": 2.3,
+      "top": 25.5,
+      "scale": 1
+    },
+    "thien_duong_pos_merit": {
+      "left": 70.2,
+      "top": 25.5,
+      "scale": 1
+    },
+    "thien_duong_pos_monk_1": {
+      "left": 28,
+      "top": 55,
+      "scale": 1
+    },
+    "thien_duong_pos_monk_2": {
+      "left": 50,
+      "top": 54,
+      "scale": 1
+    },
+    "thien_duong_pos_monk_3": {
+      "left": 72,
+      "top": 55,
+      "scale": 1
+    }
+  },
+  "textConfig": {
+    "bannerTitle": "",
+    "bannerSubtitle": "",
+    "monkLeft": "Thầy Minh Đạo",
+    "monkCenter": "Sư Trụ Trì",
+    "monkRight": "Thầy Tâm Từ",
+    "guideTitle": "HƯỚNG DẪN",
+    "guideLine1": "Thả 100 tim và bình luận bất kỳ để được lên ngồi thiên.",
+    "guideLine2": "Công đức hoa để được đọc tên",
+    "guideLine3": "Tặng quà được xướng tên",
+    "guideLine4": "✦ Hồi Hướng Công Đức ✦",
+    "meritTitle": "✦ Công Đức ✦"
+  }
 }

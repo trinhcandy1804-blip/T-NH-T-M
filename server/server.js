@@ -198,6 +198,27 @@ app.post('/api/hud/config', requireAuth, (req, res) => {
   res.json({ ok: true, hudConfig: updated });
 });
 
+// Cập nhật vị trí tọa độ các khung kéo thả (Đồng bộ thời gian thực cho OBS & Trình duyệt)
+app.post('/api/hud/position', (req, res) => {
+  const { key, position } = req.body || {};
+  if (key && position) {
+    seatManager.updateHudPosition(key, position);
+    io.emit('hud_position_changed', { key, position });
+    if (statePersistence) statePersistence.saveSnapshot();
+  }
+  res.json({ ok: true, positions: seatManager.hudPositions });
+});
+
+// Đặt lại toàn bộ vị trí các khung về mặc định
+app.post('/api/hud/positions/reset', (req, res) => {
+  const resetPos = seatManager.resetHudPositions();
+  io.emit('hud_positions_all_updated', resetPos);
+  broadcastState();
+  if (statePersistence) statePersistence.saveSnapshot();
+  console.log('[HUD] 📌 Đã đặt lại toàn bộ vị trí khung về mặc định');
+  res.json({ ok: true, positions: resetPos });
+});
+
 // Cập nhật tùy chỉnh văn bản trên Overlay (Tên chùa, Phụ đề, Tên Thầy, Bảng hướng dẫn, Bảng công đức)
 app.post('/api/text/config', requireAuth, (req, res) => {
   const updated = seatManager.updateTextConfig(req.body || {});
@@ -217,7 +238,7 @@ app.post('/api/text/reset', requireAuth, (req, res) => {
 });
 
 // Làm mới toàn bộ màn hình Overlay (OBS Studio / Trình duyệt) tức thời
-app.post('/api/overlay/reload', requireAuth, (req, res) => {
+app.post('/api/overlay/reload', (req, res) => {
   io.emit('reload_overlay', {});
   console.log('[Overlay] 🔄 Đã gửi lệnh làm mới tất cả màn hình Overlay');
   res.json({ ok: true });
@@ -274,7 +295,12 @@ app.post('/api/comment', requireAuth, (req, res) => {
   const result = seatManager.handleComment({ uniqueId, nickname, comment, avatarUrl });
   io.emit('seat_event', result);
   broadcastState();
-  console.log(`[Comment] ${nickname || uniqueId}: "${comment}" -> Ghế #${result.seatIndex + 1} (${result.seat.user.skin})`);
+  statePersistence.saveSnapshot();
+  if (result.isReplaced && result.replacedUser) {
+    console.log(`[Seats] 🔄 [${result.replacedUser.nickname}] đã nhường chỗ ngồi (ghế #${result.seatIndex + 1}) cho [${result.seat.user.nickname}]`);
+  } else {
+    console.log(`[Comment] ${nickname || uniqueId}: "${comment}" -> Ghế #${result.seatIndex + 1} (${result.seat.user.skin})`);
+  }
   res.json({ ok: true, result });
 });
 
@@ -317,13 +343,17 @@ app.post('/api/gift', requireAuth, async (req, res) => {
   broadcastState();
   console.log(`[Gift] 🎁 ${result.donorName} tặng ${result.giftName} (+${result.points} Công Đức) [Giọng: ${seatManager.voiceConfig.id}, Pitch: ${seatManager.voiceConfig.pitchHz}Hz]`);
 
-  // Phát giọng đọc kinh xướng tên hồi hướng công đức theo đúng cấu hình giọng đã chọn
-  triggerChantSpeech(result.chantText, {
-    type: 'merit_dedication',
-    donorName: result.donorName,
-    giftName: result.giftName,
-    seatIndex: result.seatIndex
-  });
+  // Phát giọng đọc kinh xướng tên hồi hướng công đức: CHỈ ĐỌC 1 LẦN NẾU TẶNG LIÊN TIẾP TRONG 10S
+  if (result.shouldSpeak && result.chantText) {
+    triggerChantSpeech(result.chantText, {
+      type: 'merit_dedication',
+      donorName: result.donorName,
+      giftName: result.giftName,
+      seatIndex: result.seatIndex
+    });
+  } else {
+    console.log(`[Gift Cooldown] ⏳ [${result.donorName}] tặng quà liên tiếp trong 10s, đã ghi nhận điểm công đức và chỉ đọc cảm ơn 1 lần.`);
+  }
 
   res.json({
     ok: true,
@@ -354,7 +384,28 @@ app.post('/api/seats/clear', requireAuth, (req, res) => {
     console.log('[Seats] Đã làm trống toàn bộ bồ đoàn');
   }
   broadcastState();
+  statePersistence.saveSnapshot();
   res.json({ ok: true, state: seatManager.getState() });
+});
+
+// Reset toàn bộ Công Đức về ban đầu (Xóa Bảng Công Đức, đưa tất cả điểm công đức về 0)
+app.post('/api/merit/reset', requireAuth, (req, res) => {
+  const state = seatManager.resetAllMerits();
+  broadcastState();
+  statePersistence.saveSnapshot();
+  io.emit('bell_ring', { reason: 'merit_reset' });
+  console.log('[Merit] ✨ Đã reset toàn bộ điểm công đức và Bảng Công Đức về ban đầu');
+  res.json({ ok: true, state });
+});
+
+// Reset toàn bộ phòng thiền (Cả Bồ đoàn + Công đức về ban đầu)
+app.post('/api/reset/all', requireAuth, (req, res) => {
+  const state = seatManager.resetAllState();
+  broadcastState();
+  statePersistence.saveSnapshot();
+  io.emit('bell_ring', { reason: 'full_reset' });
+  console.log('[System] 🔄 Đã reset toàn bộ phòng thiền về ban đầu');
+  res.json({ ok: true, state });
 });
 
 // Đổi skin trực tiếp cho 1 ghế
@@ -420,7 +471,8 @@ app.post('/api/voice/config', requireAuth, (req, res) => {
   const updated = seatManager.updateVoiceConfig(req.body || {});
   io.emit('voice_config_changed', updated);
   broadcastState();
-  console.log(`[Audio] Đã cập nhật: Giọng=${updated.id} (${updated.pitchHz}Hz), Nhạc nền=${updated.bgMusicTrack}`);
+  statePersistence.saveSnapshot();
+  console.log(`[Audio] Đã cập nhật: Giọng=${updated.id || updated.presetId} (${updated.pitchHz}Hz), Nhạc nền=${updated.bgMusicTrack}`);
   res.json({ ok: true, voiceConfig: updated });
 });
 
@@ -455,13 +507,21 @@ app.post('/api/sound/trigger', requireAuth, (req, res) => {
   res.json({ ok: true });
 });
 
-// Endpoint stream file MP3 giọng đọc kinh (hỗ trợ truyền trực tiếp thông số để nghe thử trên WinForms)
+// Endpoint stream file MP3 giọng đọc kinh (hỗ trợ truyền trực tiếp thông số để nghe thử trên WinForms & Web Admin)
 app.get('/api/tts', async (req, res) => {
   const text = req.query.text || 'Nam Mô A Di Đà Phật';
   const tempConfig = { ...seatManager.voiceConfig };
-  if (req.query.presetId && seatManager.getState().voicePresets[req.query.presetId]) {
-    Object.assign(tempConfig, seatManager.getState().voicePresets[req.query.presetId]);
+  const pId = String(req.query.presetId || '').toLowerCase();
+
+  if (pId && seatManager.getState().voicePresets[pId]) {
+    Object.assign(tempConfig, seatManager.getState().voicePresets[pId]);
   }
+  if (pId.includes('nu') || pId.includes('su_co') || pId.includes('hoaimy')) {
+    tempConfig.voiceName = 'vi-VN-HoaiMyNeural';
+  } else if (pId.includes('nam') || pId.includes('lao') || pId.includes('thay') || pId.includes('nhuanduc')) {
+    tempConfig.voiceName = 'vi-VN-NamMinhNeural';
+  }
+
   if (req.query.voiceName) tempConfig.voiceName = req.query.voiceName;
   if (req.query.pitchHz !== undefined) tempConfig.pitchHz = Number(req.query.pitchHz);
   if (req.query.ratePercent !== undefined) tempConfig.ratePercent = Number(req.query.ratePercent);
@@ -478,22 +538,66 @@ app.get('/api/tts', async (req, res) => {
   res.send(result.buffer);
 });
 
+// Hàng đợi phát đọc kinh tuần tự - TUYỆT ĐỐI KHÔNG NÓI ĐÈ GIỌNG LÊN NHAU
+const serverSpeechQueue = [];
+let isProcessingServerSpeech = false;
+
 async function triggerChantSpeech(text, meta = {}) {
-  try {
-    const activeVoiceConfig = { ...seatManager.voiceConfig };
-    const ttsRes = await synthesizeChantSpeech(text, activeVoiceConfig);
-    const audioBase64 = ttsRes && ttsRes.buffer ? ttsRes.buffer.toString('base64') : null;
-    io.emit('chant_speech', {
-      text,
-      audioBase64,
-      engine: ttsRes ? ttsRes.engine : 'web-speech-fallback',
-      voiceConfig: activeVoiceConfig,
-      ...meta
-    });
-  } catch (err) {
-    console.error('[ChantSpeech] Error:', err.message);
-  }
+  if (!text || !text.trim()) return;
+  serverSpeechQueue.push({ text: text.trim(), meta });
+  processServerSpeechQueue();
 }
+
+async function processServerSpeechQueue() {
+  if (isProcessingServerSpeech) return;
+  isProcessingServerSpeech = true;
+
+  while (serverSpeechQueue.length > 0) {
+    const item = serverSpeechQueue.shift();
+    try {
+      const activeVoiceConfig = { ...seatManager.voiceConfig };
+      const ttsRes = await synthesizeChantSpeech(item.text, activeVoiceConfig);
+      const audioBase64 = ttsRes && ttsRes.buffer ? ttsRes.buffer.toString('base64') : null;
+      io.emit('chant_speech', {
+        text: item.text,
+        audioBase64,
+        engine: ttsRes ? ttsRes.engine : 'web-speech-fallback',
+        voiceConfig: activeVoiceConfig,
+        ...item.meta
+      });
+      console.log(`[ChantSpeech] 📢 Đã phát bài kinh xướng tên: "${item.text.slice(0, 50)}..."`);
+    } catch (err) {
+      console.error('[ChantSpeech] Error:', err.message);
+    }
+  }
+
+  isProcessingServerSpeech = false;
+}
+
+// ============================================================================
+// ĐỊNH KỲ KIỂM TRA THỜI GIAN NGỒI THIỀN (CỐ ĐỊNH 10 PHÚT TỰ RỜI PHÒNG)
+// ============================================================================
+const MEDITATION_CHECK_INTERVAL_MS = 5000;
+setInterval(() => {
+  try {
+    const expiredSeats = seatManager.checkExpiredSeats(10 * 60 * 1000);
+    if (expiredSeats.length > 0) {
+      expiredSeats.forEach(exp => {
+        console.log(`[Seats] 🧘 [${exp.user.nickname}] đã hoàn thành 10 phút tĩnh tâm và rời phòng (ghế #${exp.seatIndex + 1})`);
+        io.emit('seat_event', {
+          action: 'leave_seat',
+          seatIndex: exp.seatIndex,
+          user: exp.user,
+          reason: 'time_limit_10m'
+        });
+      });
+      broadcastState();
+      statePersistence.saveSnapshot();
+    }
+  } catch (err) {
+    console.error('[SeatTimer] Error checking expired seats:', err.message);
+  }
+}, MEDITATION_CHECK_INTERVAL_MS);
 
 // ============================================================================
 // 2. KẾT NỐI TRỰC TIẾP TIKTOK LIVE (@USERNAME), AUTO-DEMO & CỔNG TIKFINITY
@@ -574,12 +678,16 @@ app.post('/api/tiktok/connect', requireAuth, async (req, res) => {
       const r = seatManager.handleGift({ uniqueId, nickname, giftName, diamondCount, repeatCount });
       io.emit('gift_event', r);
       broadcastState();
-      triggerChantSpeech(r.chantText, {
-        type: 'merit_dedication',
-        donorName: r.donorName,
-        giftName: r.giftName,
-        seatIndex: r.seatIndex
-      });
+      if (r.shouldSpeak && r.chantText) {
+        triggerChantSpeech(r.chantText, {
+          type: 'merit_dedication',
+          donorName: r.donorName,
+          giftName: r.giftName,
+          seatIndex: r.seatIndex
+        });
+      } else {
+        console.log(`[TikTok Gift Cooldown] ⏳ [${r.donorName}] tặng liên tiếp trong 10s, đã ghi nhận điểm và không đọc đè.`);
+      }
       console.log(`[TikTok Gift] 🎁 ${nickname} tặng ${resolvedGift.displayGiftName} (ID:${resolvedGift.giftId}, ${diamondCount} xu) x${repeatCount}`);
     });
 
@@ -673,12 +781,14 @@ app.post('/api/tiktok/autodemo', requireAuth, (req, res) => {
         });
         io.emit('gift_event', giftRes);
         broadcastState();
-        triggerChantSpeech(giftRes.chantText, {
-          type: 'merit_dedication',
-          donorName: giftRes.donorName,
-          giftName: giftRes.giftName,
-          seatIndex: giftRes.seatIndex
-        });
+        if (giftRes.shouldSpeak && giftRes.chantText) {
+          triggerChantSpeech(giftRes.chantText, {
+            type: 'merit_dedication',
+            donorName: giftRes.donorName,
+            giftName: giftRes.giftName,
+            seatIndex: giftRes.seatIndex
+          });
+        }
       } else {
         const cmt = demoComments[Math.floor(Math.random() * demoComments.length)];
         const cmtRes = seatManager.handleComment({
@@ -718,12 +828,14 @@ app.all('/api/tikfinity/webhook', async (req, res) => {
     });
     io.emit('gift_event', giftRes);
     broadcastState();
-    triggerChantSpeech(giftRes.chantText, {
-      type: 'merit_dedication',
-      donorName: giftRes.donorName,
-      giftName: giftRes.giftName,
-      seatIndex: giftRes.seatIndex
-    });
+    if (giftRes.shouldSpeak && giftRes.chantText) {
+      triggerChantSpeech(giftRes.chantText, {
+        type: 'merit_dedication',
+        donorName: giftRes.donorName,
+        giftName: giftRes.giftName,
+        seatIndex: giftRes.seatIndex
+      });
+    }
     return res.json({ ok: true, handled: 'gift', giftRes });
   }
 
@@ -771,12 +883,14 @@ function connectTikFinitySocket() {
           });
           io.emit('gift_event', r);
           broadcastState();
-          triggerChantSpeech(r.chantText, {
-            type: 'merit_dedication',
-            donorName: r.donorName,
-            giftName: r.giftName,
-            seatIndex: r.seatIndex
-          });
+          if (r.shouldSpeak && r.chantText) {
+            triggerChantSpeech(r.chantText, {
+              type: 'merit_dedication',
+              donorName: r.donorName,
+              giftName: r.giftName,
+              seatIndex: r.seatIndex
+            });
+          }
         }
       } catch (e) {}
     });
@@ -791,19 +905,7 @@ function connectTikFinitySocket() {
 }
 connectTikFinitySocket();
 
-setInterval(() => {
-  const cfg = seatManager.voiceConfig;
-  if (!cfg.autoChantEnabled) return;
-  const elapsedSec = Math.floor((Date.now() - (seatManager._lastAutoChant || 0)) / 1000);
-  if (elapsedSec >= (cfg.autoChantIntervalSec || 120)) {
-    seatManager._lastAutoChant = Date.now();
-    const chant = seatManager.getNextScriptureChant();
-    triggerChantSpeech(chant, {
-      type: 'scripture_chant',
-      title: 'Tụng Kinh Định Kỳ'
-    });
-  }
-}, 15000);
+// Đã tắt tự động đọc kinh ngẫu nhiên (chỉ phát khi người dùng tự ấn nút thủ công trên Bảng Điều Khiển / Toolbar)
 
 // ============================================================================
 // 3. SOCKET.IO CONNECTION
@@ -829,6 +931,21 @@ io.on('connection', socket => {
     io.emit('hud_config_changed', updated);
     broadcastState();
     console.log(`[HUD] Cập nhật vị trí: ${updated.guidePosition} (X:${updated.guidePosX}%, Y:${updated.guidePosY}%, OffsetY:${updated.guideOffsetY}px)`);
+  });
+
+  socket.on('update_hud_position', data => {
+    if (data && data.key && data.position) {
+      seatManager.updateHudPosition(data.key, data.position);
+      socket.broadcast.emit('hud_position_changed', data);
+      if (statePersistence) statePersistence.saveSnapshot();
+    }
+  });
+
+  socket.on('reset_hud_positions', () => {
+    const resetPos = seatManager.resetHudPositions();
+    io.emit('hud_positions_all_updated', resetPos);
+    broadcastState();
+    if (statePersistence) statePersistence.saveSnapshot();
   });
 });
 

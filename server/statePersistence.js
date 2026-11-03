@@ -36,6 +36,7 @@ class StatePersistence {
             guideOpacity: 0.85,
             guideCollapsed: false
           },
+          hudPositions: this.seatManager.hudPositions || {},
           textConfig: this.seatManager.textConfig || {},
           ...extraData
         };
@@ -74,6 +75,9 @@ class StatePersistence {
       }
       if (data.hudConfig) {
         this.seatManager.hudConfig = { ...(this.seatManager.hudConfig || {}), ...data.hudConfig };
+      }
+      if (data.hudPositions) {
+        this.seatManager.hudPositions = { ...(this.seatManager.hudPositions || {}), ...data.hudPositions };
       }
       if (data.textConfig) {
         this.seatManager.textConfig = { ...(this.seatManager.textConfig || {}), ...data.textConfig };
