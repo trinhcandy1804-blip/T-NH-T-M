@@ -1,0 +1,13 @@
+{
+  "name": "phat-online",
+  "version": "1.0.0",
+  "description": "App Live Stream Di Chua Bai Phat Online - Thien Duong Tinh Tam",
+  "main": "server/server.js",
+  "scripts": {
+    "build": "cd server && npm install",
+    "start": "node server/server.js"
+  },
+  "engines": {
+    "node": ">=18.0.0"
+  }
+}
