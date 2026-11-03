@@ -1206,6 +1206,19 @@ class TempleSceneRenderer {
   }
 }
 
-window.addEventListener('DOMContentLoaded', () => {
-  window.templeScene = new TempleSceneRenderer();
-});
+function initTempleSceneGlobal() {
+  if (!window.templeScene && document.getElementById('three-canvas') && document.getElementById('scene-canvas')) {
+    try {
+      window.templeScene = new TempleSceneRenderer();
+    } catch (err) {
+      console.warn('[TempleScene] Lỗi khởi tạo Three.js / Canvas 2.5D:', err);
+    }
+  }
+}
+
+if (document.readyState === 'loading') {
+  window.addEventListener('DOMContentLoaded', initTempleSceneGlobal);
+} else {
+  initTempleSceneGlobal();
+}
+window.initTempleSceneGlobal = initTempleSceneGlobal;

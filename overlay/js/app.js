@@ -4,7 +4,11 @@
  */
 
 (function () {
-  const socket = io();
+  const socket = io({
+    transports: ['websocket', 'polling'],
+    reconnection: true,
+    reconnectionDelay: 1000
+  });
   const bgLayer = document.getElementById('theme-bg-layer');
   const bannerTitle = document.getElementById('banner-title');
   const bannerSubtitle = document.getElementById('banner-subtitle');
@@ -183,13 +187,13 @@
     sessionTimer.textContent = `${hrs}:${mins}:${secs}`;
   }, 1000);
 
-  // Nhận cập nhật trạng thái từ Node.js Server
-  socket.on('state_update', state => {
+  // Áp dụng toàn bộ trạng thái phòng thiền lên giao diện
+  function applyFullState(state) {
     if (!state) return;
     if (state.sessionStartTime) {
       sessionStartTime = state.sessionStartTime - 45000;
     }
-    if (seatCounter) {
+    if (seatCounter && state.occupiedCount !== undefined) {
       seatCounter.textContent = `${state.occupiedCount}/${state.totalSeats}`;
     }
     if (state.theme) {
@@ -207,10 +211,32 @@
     if (state.hudPositions) {
       applyAllHudPositions(state.hudPositions);
     }
+    if (!window.templeScene && window.initTempleSceneGlobal) {
+      window.initTempleSceneGlobal();
+    }
     if (window.templeScene && state.seats) {
       window.templeScene.updateSeats(state.seats, state.gridCols, state.gridRows);
     }
-    renderMeritList(state.meritList);
+    if (state.meritList) {
+      renderMeritList(state.meritList);
+    }
+  }
+
+  // Khởi tạo tức thì ngay khi mở trang web qua HTTP REST API (Không để màn hình đen chờ Socket)
+  function initFast() {
+    fetch('/api/state')
+      .then(r => r.json())
+      .then(s => applyFullState(s))
+      .catch(e => console.warn('[App] Lỗi nạp state tức thời:', e));
+  }
+  initFast();
+  if (document.readyState === 'loading') {
+    window.addEventListener('DOMContentLoaded', initFast);
+  }
+
+  // Nhận cập nhật trạng thái từ Node.js Server qua Socket.IO
+  socket.on('state_update', state => {
+    applyFullState(state);
   });
 
   socket.on('theme_changed', ({ theme }) => {

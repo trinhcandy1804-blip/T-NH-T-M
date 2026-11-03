@@ -9,16 +9,16 @@
   <link rel="preconnect" href="https://fonts.googleapis.com">
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
   <link href="https://fonts.googleapis.com/css2?family=Be+Vietnam+Pro:ital,wght@0,400;0,500;0,600;0,700;0,800;1,400&family=Noto+Serif:ital,wght@0,600;0,700;0,800;1,400&display=swap" rel="stylesheet">
-  <link rel="stylesheet" href="/css/style.css?v=6.8" />
-  <!-- Three.js CDN cho hiệu ứng hạt 3D, Hào quang & Ánh sáng Chánh Điện -->
-  <script src="https://cdnjs.cloudflare.com/ajax/libs/three.js/r128/three.min.js"></script>
+  <link rel="stylesheet" href="/css/style.css?v=7.1" />
+  <!-- Three.js cục bộ nạp trực tiếp siêu tốc, không phụ thuộc CDN nước ngoài -->
+  <script src="/js/three.min.js"></script>
   <script src="/socket.io/socket.io.js"></script>
 </head>
-<body class="theme-1">
+<body class="theme-2">
   <!-- Khung chuẩn 9:16 cho ManyCam & TikTok Live Studio -->
   <div id="stage-container">
     <!-- 1. Lớp nền Chánh Điện (5 mẫu thiết kế) -->
-    <div id="theme-bg-layer" class="bg-layer"></div>
+    <div id="theme-bg-layer" class="bg-layer" style="background-image: url('/assets/themes/theme_2_bg.jpg');"></div>
 
     <!-- 2. Lớp Three.js WebGL (Hào quang Phật, Khói trầm hương 3D, Hoa sen rơi, Đèn trời) -->
     <canvas id="three-canvas"></canvas>
@@ -136,8 +136,8 @@
     </div>
   </div>
 
-  <script src="/js/audioEngine.js?v=6.3"></script>
-  <script src="/js/templeScene.js?v=6.7"></script>
-  <script src="/js/app.js?v=7.0"></script>
+  <script src="/js/audioEngine.js?v=7.1"></script>
+  <script src="/js/templeScene.js?v=7.1"></script>
+  <script src="/js/app.js?v=7.1"></script>
 </body>
 </html>
