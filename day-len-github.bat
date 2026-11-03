@@ -1,6 +1,7 @@
 @echo off
 title Day Code Len GitHub - Thien Duong Tinh Tam
 cd /d "%~dp0"
+set "PATH=C:\Users\ADMIN\AppData\Local\Programs\Git\cmd;C:\Program Files\Git\cmd;%PATH%"
 
 echo ==================================================================
 echo   DANG DAY TOAN BO MA NGUON LEN GITHUB REPO MOI
