@@ -4,7 +4,7 @@ cd /d "%~dp0"
 
 echo ==================================================================
 echo   DANG DAY TOAN BO MA NGUON LEN GITHUB REPO MOI
-echo   Repo: https://github.com/tuehue02-sketch/ph-t-online_1.git
+echo   Repo: https://github.com/trinhcandy1804-blip/T-NH-T-M.git
 echo ==================================================================
 echo.
 

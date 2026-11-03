@@ -10,6 +10,8 @@ yarn-error.log*
 
 # Cloudflared binary
 cloudflared.exe
+node.exe
+server/node.exe
 
 # OS generated files
 .DS_Store
