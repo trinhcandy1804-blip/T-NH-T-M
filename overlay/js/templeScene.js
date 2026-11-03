@@ -10,7 +10,20 @@ class TempleSceneRenderer {
     this.seatLabelsLayer = document.getElementById('seat-labels-layer');
 
     this.currentThemeId = 1;
+    this.gridCols = 4;
+    this.gridRows = 6;
     this.seats = [];
+    for (let r = 0; r < 6; r++) {
+      for (let c = 0; c < 4; c++) {
+        this.seats.push({
+          index: r * 4 + c,
+          row: r,
+          col: c,
+          occupied: false,
+          user: null
+        });
+      }
+    }
     this.seatBurstEffects = {}; // seatIndex -> { startTime, color }
     this.activeIncenseOfferings = new Map(); // seatIndex -> { seatIndex, user, startTime }
     this.woodenFishPulse = 0;

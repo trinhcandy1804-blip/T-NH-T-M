@@ -77,6 +77,10 @@
     if (!theme) return;
     currentThemeObj = theme;
     document.body.className = `theme-${theme.id}`;
+    const bgImg = document.getElementById('theme-bg-img');
+    if (bgImg && theme.bgImage) {
+      bgImg.src = theme.bgImage;
+    }
     if (bgLayer) {
       bgLayer.style.backgroundImage = `url('${theme.bgImage}')`;
     }

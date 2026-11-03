@@ -31,6 +31,17 @@ html, body {
 }
 
 /* 1. Lớp ảnh nền 5 mẫu thiết kế */
+.bg-layer-img {
+  position: absolute;
+  inset: 0;
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+  object-position: center center;
+  z-index: 1;
+  pointer-events: none;
+}
+
 .bg-layer {
   position: absolute;
   inset: 0;
